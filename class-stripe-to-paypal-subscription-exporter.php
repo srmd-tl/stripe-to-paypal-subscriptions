@@ -10,11 +10,14 @@ class Stripe_To_Paypal_Subscription_Exporter {
 	/** @var string plugin path, without trailing slash */
 	private $plugin_path;
 	private $setting_class;
+	private $rest_api_class;
+
 
 	public function __construct() {
 		$this->includes();
 		/** Step 2 (from text above). */
 		add_action( 'admin_menu', [ $this->setting_class, 'add_config_item' ] );
+		add_action( 'admin_menu',[ $this->rest_api_class, 'add_menu' ] );
 
 	}
 
@@ -27,6 +30,7 @@ class Stripe_To_Paypal_Subscription_Exporter {
 	 */
 	public function includes() {
 		$this->setting_class= $this->load_class( '/src/stripe-to-paypal-settings.php', 'StripeToPaypalSettings' );
+		$this->rest_api_class=$this->load_class('/src/stripe-to-paypal-rest-apis.php','StripeToPaypalAPI');
 	}
 
 	/**
