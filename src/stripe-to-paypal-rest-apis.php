@@ -52,11 +52,16 @@ class StripeToPaypalAPI {
 	}
 
 
+	/**
+	 * @throws Exception
+	 */
 	public function process()
 	{
 		$obj=StripeToPaypal_StripeClient::instance();
+		$paypalObj=StripeToPaypal_PaypalClient::instance();
+
 		echo "<pre>";
-		print_r($obj->getStripeSubscriptions());
+		print_r($paypalObj->getToken());
 	}
 }
 

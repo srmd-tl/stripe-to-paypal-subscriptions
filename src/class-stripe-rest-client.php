@@ -3,7 +3,7 @@ defined( 'ABSPATH' ) or exit;
 
 class StripeToPaypal_StripeClient {
 	/**
-	 * @var StripeToPaypalSettings single instance of this file;
+	 * @var StripeToPaypal_StripeClient single instance of this file;
 	 */
 	protected static $instance;
 
@@ -57,7 +57,6 @@ class StripeToPaypal_StripeClient {
 	public function getStripeSubscriptions() {
 		$headers  = [ 'headers' => $this->headers ];
 		$url =$this->base_url . '/subscriptions';
-		echo $url;
 		$response = wp_remote_get($url , $headers );
 		if ( wp_remote_retrieve_response_code($response) != 200 ) {
 			throw new Exception( wp_remote_retrieve_response_message($response) );
