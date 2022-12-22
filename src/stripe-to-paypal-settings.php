@@ -11,7 +11,7 @@ class StripeToPaypalSettings
 
 	/** Step 1. */
 	public function add_config_item() {
-		add_options_page( 'My Plugin Options', 'My Plugin', 'manage_options', 'my-unique-identifier', [$this,'template'] );
+		add_options_page( __('Stripe To PayPal Subscription Exporter-Options','stripe-to-paypal-exporter'), __('Stripe To PayPal Configs','stripe-to-paypal-exporter'), 'manage_options', 'stripe-to-paypal-exporter-settings', [$this,'template'] );
 	}
 
 	/** Step 3. */

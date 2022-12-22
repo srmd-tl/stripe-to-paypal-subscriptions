@@ -2,7 +2,7 @@
 
 /**
  * Plugin Name: Stripe To PayPal Subscription Exporter.
- * Plugin URI: https://www.woocommerce.com/products/woocommerce-memberships/
+ * Plugin URI: https://www.revvlab.com/
  * Description: Export subscription related data from Stripe to Paypal.
  * Author: RevvLab
  * Author URI: https://www.revvlab.com/
