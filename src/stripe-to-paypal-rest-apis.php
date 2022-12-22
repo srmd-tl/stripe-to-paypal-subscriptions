@@ -6,6 +6,8 @@ class StripeToPaypalAPI {
 	 * @var StripeToPaypalSettings single instance of this file;
 	 */
 	protected static $instance;
+	private $stripeCreds;
+	private $paypalCreds;
 
 	public function __construct() {
 
@@ -49,18 +51,21 @@ class StripeToPaypalAPI {
 		);
 	}
 
+
 	public function process()
 	{
-		die('ere');
+		$obj=StripeToPaypal_StripeClient::instance();
+		echo "<pre>";
+		print_r($obj->getStripeSubscriptions());
 	}
 }
 
-if ( $_POST['action'] ?? false ) {
-
-	$obj = StripeToPaypalAPI::instance();
-	try {
-		$obj->storeKeys();
-	} catch ( Exception $e ) {
-		var_dump( $e->getMessage() );
-	}
-}
+//if ( $_POST['action'] ?? false ) {
+//
+//	$obj = StripeToPaypalAPI::instance();
+//	try {
+//		$obj->storeKeys();
+//	} catch ( Exception $e ) {
+//		var_dump( $e->getMessage() );
+//	}
+//}

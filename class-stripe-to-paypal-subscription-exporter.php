@@ -11,6 +11,8 @@ class Stripe_To_Paypal_Subscription_Exporter {
 	private $plugin_path;
 	private $setting_class;
 	private $rest_api_class;
+	private $stripe_rest_client;
+
 
 
 	public function __construct() {
@@ -31,6 +33,8 @@ class Stripe_To_Paypal_Subscription_Exporter {
 	public function includes() {
 		$this->setting_class= $this->load_class( '/src/stripe-to-paypal-settings.php', 'StripeToPaypalSettings' );
 		$this->rest_api_class=$this->load_class('/src/stripe-to-paypal-rest-apis.php','StripeToPaypalAPI');
+		$this->stripe_rest_client=$this->load_class('/src/class-stripe-rest-client.php','StripeToPaypal_StripeClient');
+
 	}
 
 	/**
