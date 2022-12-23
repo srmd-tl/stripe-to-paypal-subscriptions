@@ -35,13 +35,13 @@ class StripeToPaypal_StripeClient {
 	 * Returns the Memberships instance singleton.
 	 *
 	 * Ensures only one instance is/can be loaded.
-	 * @return StripeToPaypalAPI
+	 * @return StripeToPaypal_StripeClient
 	 * @since 1.0.0
 	 *
 	 * @see wc_memberships()
 	 *
 	 */
-	public static function instance() {
+	public static function instance(): StripeToPaypal_StripeClient {
 
 		if ( null === self::$instance ) {
 
@@ -53,11 +53,14 @@ class StripeToPaypal_StripeClient {
 
 	/**
 	 * Get all subscriptions.
+	 *
+	 * @param null $startingAfter
+	 *
 	 * @return object
 	 * @throws Exception
 	 */
-	public function getStripeSubscriptions($startingAfter = null): object {
-		$headers  = [
+	public function getStripeSubscriptions( $startingAfter = null ): object {
+		$headers = [
 			'headers' => $this->headers,
 			'body'    => [ 'limit' => 100 ]
 		];
@@ -75,11 +78,14 @@ class StripeToPaypal_StripeClient {
 
 	/**
 	 * Get all prices/plans
+	 *
+	 * @param null $startingAfter
+	 *
 	 * @return object
 	 * @throws Exception
 	 */
-	public function getStripePlans($startingAfter = null): object {
-		$headers  = [ 'headers' => $this->headers, 'body' => [ 'limit' => 100 ] ];
+	public function getStripePlans( $startingAfter = null ): object {
+		$headers = [ 'headers' => $this->headers, 'body' => [ 'limit' => 100 ] ];
 		if ( $startingAfter ) {
 			$headers['body']['starting_after'] = $startingAfter;
 		}
@@ -110,6 +116,7 @@ class StripeToPaypal_StripeClient {
 		if ( wp_remote_retrieve_response_code( $response ) != 200 ) {
 			throw new Exception( wp_remote_retrieve_response_message( $response ) );
 		}
+
 		return json_decode( wp_remote_retrieve_body( $response ) );
 	}
 }

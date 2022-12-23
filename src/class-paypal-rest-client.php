@@ -37,13 +37,13 @@ class StripeToPaypal_PaypalClient {
 	 * Returns the Memberships instance singleton.
 	 *
 	 * Ensures only one instance is/can be loaded.
-	 * @return StripeToPaypalAPI
+	 * @return StripeToPaypal_PaypalClient
 	 * @since 1.0.0
 	 *
 	 * @see wc_memberships()
 	 *
 	 */
-	public static function instance() {
+	public static function instance(): StripeToPaypal_PaypalClient {
 
 		if ( null === self::$instance ) {
 
