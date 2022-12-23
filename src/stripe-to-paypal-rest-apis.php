@@ -55,13 +55,95 @@ class StripeToPaypalAPI {
 	/**
 	 * @throws Exception
 	 */
-	public function process()
-	{
-		$obj=StripeToPaypal_StripeClient::instance();
-		$paypalObj=StripeToPaypal_PaypalClient::instance();
+	public function process() {
+		$obj       = StripeToPaypal_StripeClient::instance();
+		$paypalObj = StripeToPaypal_PaypalClient::instance();
+
+		try {
+			//Fetch products from stripe and store in paypal.
+			$startingAfter = null;
+			do {
+				$products = $obj->getStripeProducts( $startingAfter );
+				foreach ( $products->data as $product ) {
+					$data = [
+						'name'        => $product->name,
+						'description' => $product->description,
+						'id'          => $product->id,
+						'type'        => $product->type
+					];
+
+					$paypalObj->createProduct( $data );
+				}
+				$next = $products->has_more;
+			} while ( $next );
+		} catch ( Exception $e ) {
+			error_log( print_r( $e->getMessage(),true) );
+			print_r( $e->getMessage() );
+		}
+
+		try {
+			//Fetch plans from stripe and store in paypal.
+			$startingAfter = null;
+			do {
+
+				$plans = $obj->getStripePlans( $startingAfter );
+				foreach ( $plans->data as $plan ) {
+					$isTrial      = $plan->trial_period_days ? true : false;
+					$billingCycle = [
+						'frequency'      => [
+							'interval_unit'  => $plan->interval,
+							'interval_count' => $plan->interval_count,
+						],
+						'sequence'       => 1,
+						'tenure_type'    => $isTrial ? 'TRIAL' : 'REGULAR',
+						'total_cycles'   => $plan->interval_count,
+						'pricing_scheme' => [
+							'fixed_price' => [
+								'value'         => $plan->amount,
+								'currency_code' => strtoupper( $plan->currency )
+							]
+						]
+					];
+					$paymentPref  = [
+						'auto_bill_outstanding'     => true,
+						'setup_fee'                 => [
+							'value'         => $plan->amount,
+							'currency_code' => strtoupper( $plan->currency )
+						],
+						'setup_fee_failure_action'  => 'CONTINUE',
+						'payment_failure_threshold' => 3
+					];
+					$data         = [
+						'billing_cycles'      => $billingCycle,
+						'name'                => $plan->nickname ?? $plan->id,
+						'payment_preferences' => $paymentPref,
+						'product_id'          => $plan->product,
+						'status'              => $plan->active ? 'ACTIVE' : 'INACTIVE'
+					];
+					$paypalObj->createPlan( $data );
+				}
+				$startingAfter = $plan->id;
+				$next          = $plans->has_more;
+			} while ( $next );
+		} catch ( Exception $e ) {
+			error_log( print_r( $e->getMessage(),true) );
+			print_r( $e->getMessage() );
+		}
+
+		//Fetch subscriptions from stripe and store in paypal.
+		$startingAfter = null;
+		do {
+			$subscriptions = $obj->getStripeSubscriptions();
+			foreach ( $subscriptions as $subscription ) {
+				//save in paypal.
+			}
+			$startingAfter = $subscription->id;
+			$next          = $subscriptions->has_more;
+		} while ( $next );
 
 		echo "<pre>";
-		print_r($paypalObj->getToken());
+//		print_r($paypalObj->getToken());
+		print_r( $obj->getStripeSubscriptions() );
 	}
 }
 

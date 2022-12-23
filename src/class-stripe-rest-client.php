@@ -26,6 +26,7 @@ class StripeToPaypal_StripeClient {
 		if ( $creds ) {
 			$creds = unserialize( $creds );
 		}
+
 		return $creds;
 
 	}
@@ -51,20 +52,64 @@ class StripeToPaypal_StripeClient {
 	}
 
 	/**
-	 * @return string
+	 * Get all subscriptions.
+	 * @return object
 	 * @throws Exception
 	 */
-	public function getStripeSubscriptions() {
-		$headers  = [ 'headers' => $this->headers ];
-		$url =$this->base_url . '/subscriptions';
-		$response = wp_remote_get($url , $headers );
-		if ( wp_remote_retrieve_response_code($response) != 200 ) {
-			throw new Exception( wp_remote_retrieve_response_message($response) );
+	public function getStripeSubscriptions($startingAfter = null): object {
+		$headers  = [
+			'headers' => $this->headers,
+			'body'    => [ 'limit' => 100 ]
+		];
+		if ( $startingAfter ) {
+			$headers['body']['starting_after'] = $startingAfter;
 		}
-		return json_decode(wp_remote_retrieve_body($response));
+		$url      = $this->base_url . '/subscriptions';
+		$response = wp_remote_get( $url, $headers );
+		if ( wp_remote_retrieve_response_code( $response ) != 200 ) {
+			throw new Exception( wp_remote_retrieve_response_message( $response ) );
+		}
+
+		return json_decode( wp_remote_retrieve_body( $response ) );
 	}
 
-	public function getStripePlan() {
+	/**
+	 * Get all prices/plans
+	 * @return object
+	 * @throws Exception
+	 */
+	public function getStripePlans($startingAfter = null): object {
+		$headers  = [ 'headers' => $this->headers, 'body' => [ 'limit' => 100 ] ];
+		if ( $startingAfter ) {
+			$headers['body']['starting_after'] = $startingAfter;
+		}
+		$url      = $this->base_url . '/plans';
+		$response = wp_remote_get( $url, $headers );
+		if ( wp_remote_retrieve_response_code( $response ) != 200 ) {
+			throw new Exception( wp_remote_retrieve_response_message( $response ) );
+		}
 
+		return json_decode( wp_remote_retrieve_body( $response ) );
+	}
+
+	/**
+	 * Get all products.
+	 *
+	 * @param null $startingAfter the last object id.
+	 *
+	 * @return object
+	 * @throws Exception
+	 */
+	public function getStripeProducts( $startingAfter = null ): object {
+		$headers = [ 'headers' => $this->headers, 'body' => [ 'limit' => 100 ] ];
+		if ( $startingAfter ) {
+			$headers['body']['starting_after'] = $startingAfter;
+		}
+		$url      = $this->base_url . '/products';
+		$response = wp_remote_get( $url, $headers );
+		if ( wp_remote_retrieve_response_code( $response ) != 200 ) {
+			throw new Exception( wp_remote_retrieve_response_message( $response ) );
+		}
+		return json_decode( wp_remote_retrieve_body( $response ) );
 	}
 }
