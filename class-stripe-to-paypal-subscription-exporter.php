@@ -19,7 +19,9 @@ class Stripe_To_Paypal_Subscription_Exporter {
 		$this->includes();
 		/** Step 2 (from text above). */
 		add_action( 'admin_menu', [ $this->setting_class, 'add_config_item' ] );
-		add_action( 'admin_menu', [ $this->rest_api_class, 'add_menu' ] );
+//		add_action( 'admin_menu', [ $this->rest_api_class, 'add_menu' ] );
+		add_action( 's2p_exporter', [ $this->rest_api_class, 'process' ] );
+
 
 	}
 

@@ -20,6 +20,8 @@ class StripeToPaypal_PaypalClient {
 			'Authorization' => 'Basic ' . base64_encode( $creds ),
 			'Content-Type'  => 'application/json',
 		];
+
+
 	}
 
 	public function getCreds() {
@@ -78,7 +80,7 @@ class StripeToPaypal_PaypalClient {
 	public function createProduct( $data ): object {
 		try {
 			$headers                      = [ 'headers' => $this->headers ];
-			$headers['headers']['Prefer'] = 'minimal';
+			$headers['headers']['Prefer'] = 'return=minimal';
 			$headers['body']              = json_encode( [
 				'id'          => $data['id'],
 				'name'        => $data['name'],
@@ -87,6 +89,8 @@ class StripeToPaypal_PaypalClient {
 			] );
 			$url                          = $this->base_url . '/catalogs/products';
 			$response                     = wp_remote_post( $url, $headers );
+//			echo "<pre>";
+//			print_r($response);
 			if ( ! in_array( wp_remote_retrieve_response_code( $response ), [ 200, 202, 201, 204 ] ) ) {
 				throw new Exception( wp_remote_retrieve_response_message( $response ) );
 			}
@@ -111,7 +115,7 @@ class StripeToPaypal_PaypalClient {
 	public function createPlan( $data ): object {
 		try {
 			$headers                      = [ 'headers' => $this->headers ];
-			$headers['headers']['Prefer'] = 'minimal';
+			$headers['headers']['Prefer'] = 'return=minimal';
 
 			$headers['body'] = json_encode( [
 				'billing_cycles'      => [ $data['billing_cycles'] ],
@@ -136,14 +140,35 @@ class StripeToPaypal_PaypalClient {
 
 	}
 
-	public function createSubscription( $data ) {
-		$headers  = [ 'headers' => $this->headers, 'body' => [ 'grant_type' => 'client_credentials' ] ];
-		$url      = $this->base_url . '/billing/subscriptions';
-		$response = wp_remote_post( $url, $headers );
-		if ( ! in_array( wp_remote_retrieve_response_code( $response ), [ 200, 202, 201, 204 ] ) ) {
-			throw new Exception( wp_remote_retrieve_response_message( $response ) );
+	/**
+	 * Create Subscription.
+	 *
+	 * @param $data
+	 *
+	 * @return object
+	 * @throws Exception
+	 */
+	public function createSubscription( $data ): object {
+		try {
+			$headers                      = [ 'headers' => $this->headers ];
+			$headers['body']              = json_encode( [
+				'plan_id'         => $data['plan_id'],
+				'quantity'        => $data['quantity'],
+				'start_time'      => $data['start_time'],
+				'shipping_amount' => $data['shipping_amount'],
+				'subscriber'      => $data['subscriber']
+			] );
+			$url                          = $this->base_url . '/billing/subscriptions';
+			$response                     = wp_remote_post( $url, $headers );
+
+			if ( ! in_array( wp_remote_retrieve_response_code( $response ), [ 200, 202, 201, 204 ] ) ) {
+				throw new Exception( wp_remote_retrieve_response_message( $response ) );
+			}
+
+			return json_decode( wp_remote_retrieve_body( $response ) );
+		} catch ( Exception $exception ) {
+			throw new Exception( $exception->getMessage() );
 		}
 
-		return json_decode( wp_remote_retrieve_body( $response ) );
 	}
 }

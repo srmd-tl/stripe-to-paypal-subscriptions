@@ -119,4 +119,23 @@ class StripeToPaypal_StripeClient {
 
 		return json_decode( wp_remote_retrieve_body( $response ) );
 	}
+
+	/**
+	 * Get customer info by its id.
+	 * @param $id
+	 *
+	 * @return object
+	 * @throws Exception
+	 */
+	public function getCustomer( $id ):object {
+		$headers = [ 'headers' => $this->headers ];
+
+		$url      = $this->base_url . '/customers/' . $id;
+		$response = wp_remote_get( $url, $headers );
+		if ( wp_remote_retrieve_response_code( $response ) != 200 ) {
+			throw new Exception( wp_remote_retrieve_response_message( $response ) );
+		}
+
+		return json_decode( wp_remote_retrieve_body( $response ) );
+	}
 }
