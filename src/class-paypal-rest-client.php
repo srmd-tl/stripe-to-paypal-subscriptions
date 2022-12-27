@@ -14,14 +14,14 @@ class StripeToPaypal_PaypalClient {
 
 	public function __construct() {
 		$this->paypalCreds = $this->getCreds();
-		$this->base_url    = 'https://api-m.sandbox.paypal.com/v1';
+		$this->base_url    = isset( $this->paypalCreds['mode'] ) && $this->paypalCreds['mode'] == 'on'
+			? 'https://api-m.paypal.com'
+			: 'https://api-m.sandbox.paypal.com/v1';
 		$creds             = $this->paypalCreds['client_id'] . ':' . $this->paypalCreds['secret_key'];
 		$this->headers     = [
 			'Authorization' => 'Basic ' . base64_encode( $creds ),
 			'Content-Type'  => 'application/json',
 		];
-
-
 	}
 
 	public function getCreds() {
@@ -85,7 +85,7 @@ class StripeToPaypal_PaypalClient {
 				'id'          => $data['id'],
 				'name'        => $data['name'],
 				'type'        => strtoupper( $data['type'] ),
-				'description' => $data['description']
+				'description' => $data['description'],
 			] );
 			$url                          = $this->base_url . '/catalogs/products';
 			$response                     = wp_remote_post( $url, $headers );
@@ -122,7 +122,7 @@ class StripeToPaypal_PaypalClient {
 				'name'                => $data['name'],
 				'payment_preferences' => $data['payment_preferences'],
 				'product_id'          => $data['product_id'],
-				'status'              => $data['status']
+				'status'              => $data['status'],
 			] );
 
 
@@ -150,16 +150,16 @@ class StripeToPaypal_PaypalClient {
 	 */
 	public function createSubscription( $data ): object {
 		try {
-			$headers                      = [ 'headers' => $this->headers ];
-			$headers['body']              = json_encode( [
+			$headers         = [ 'headers' => $this->headers ];
+			$headers['body'] = json_encode( [
 				'plan_id'         => $data['plan_id'],
 				'quantity'        => $data['quantity'],
 				'start_time'      => $data['start_time'],
 				'shipping_amount' => $data['shipping_amount'],
-				'subscriber'      => $data['subscriber']
+				'subscriber'      => $data['subscriber'],
 			] );
-			$url                          = $this->base_url . '/billing/subscriptions';
-			$response                     = wp_remote_post( $url, $headers );
+			$url             = $this->base_url . '/billing/subscriptions';
+			$response        = wp_remote_post( $url, $headers );
 
 			if ( ! in_array( wp_remote_retrieve_response_code( $response ), [ 200, 202, 201, 204 ] ) ) {
 				throw new Exception( wp_remote_retrieve_response_message( $response ) );

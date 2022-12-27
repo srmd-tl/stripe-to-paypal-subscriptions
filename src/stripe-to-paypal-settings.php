@@ -56,7 +56,6 @@ class StripeToPaypalSettings {
 			$paypalCreds = unserialize( $paypalCreds );
 
 		}
-
 		?>
         <div class="wrap">
             <div id="icon-tools" class="icon32"></div>
@@ -78,6 +77,8 @@ class StripeToPaypalSettings {
                 <div>
                     <input type="text" name="paypal_client_id" placeholder="Client ID" value="<?=$paypalCreds['client_id']?>">
                     <input type="text" name="paypal_sec_key" placeholder="Secret  Key" value="<?=$paypalCreds['secret_key']?>">
+                    Live <input type="checkbox" name="paypal_mode"  <?= $paypalCreds['mode']=='on'?'checked':''?>>
+
                     <input type="hidden" name="action" value="paypal">
                     <input type="submit" name="submit" id="submit" class="update-button button button-primary"
                            value="Update API Key"/>
@@ -133,6 +134,8 @@ class StripeToPaypalSettings {
 
 			$payload['client_id']  = sanitize_text_field( $_POST['paypal_client_id'] );
 			$payload['secret_key'] = sanitize_text_field( $_POST['paypal_sec_key'] );
+			$payload['mode'] = sanitize_text_field( $_POST['paypal_mode'] );
+
 			if ( ! $apiExists && ! empty( $_POST['paypal_client_id'] ) && ! empty( $_POST['paypal_sec_key'] ) ) {
 
 				add_option( 'paypal_api_creds', serialize( $payload ) );

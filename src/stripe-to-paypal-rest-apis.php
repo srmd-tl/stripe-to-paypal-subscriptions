@@ -54,49 +54,49 @@ class StripeToPaypalAPI {
 	 * @throws Exception
 	 */
 	public function process() {
-
+		error_log('Cronstarted at'.date('y-m-d h:i:s'));
 		$obj       = StripeToPaypal_StripeClient::instance();
 		$paypalObj = StripeToPaypal_PaypalClient::instance();
 		$i=0;
 
-//		try {
-//			//Fetch products from stripe and store in paypal.
-//			$productId     = get_option( 'start_after_product_id' ) ?? null;
-//			$startingAfter = null;
-//			if ( $productId ) {
-//				$startingAfter = $productId;
-//			}
-//			do {
-//				$products = $obj->getStripeProducts( $startingAfter );
-//				foreach ( $products->data as $product ) {
-//					$i++;
-//					echo $i.PHP_EOL;
-//					$data      = [
-//						'name'        => $product->name,
-//						'description' => $product->description,
-//						'id'          => $product->id,
-//						'type'        => $product->type,
-//					];
-//					$productId = $product->id;
-//					$this->updateOrCreateOption( 'start_after_product_id', $productId );
-//					try {
-//						$paypalObj->createProduct( $data );
-//					}
-//					catch (Exception $e )
-//					{
-//						error_log( print_r( $e->getMessage(), true ) );
-//					}
-//				}
-//				$next = $products->has_more;
-//				$startingAfter = $productId;
-//
-//			} while ( $next );
-//			$this->updateOrCreateOption( 'start_after_product_id', $productId );
-//
-//		} catch ( Exception $e ) {
-//			error_log( print_r( $e->getMessage(), true ) );
-//			print_r( $e->getMessage() );
-//		}
+		try {
+			//Fetch products from stripe and store in paypal.
+			$productId     = get_option( 'start_after_product_id' ) ?? null;
+			$startingAfter = null;
+			if ( $productId ) {
+				$startingAfter = $productId;
+			}
+			do {
+				$products = $obj->getStripeProducts( $startingAfter );
+				foreach ( $products->data as $product ) {
+					$i++;
+					echo $i.PHP_EOL;
+					$data      = [
+						'name'        => $product->name,
+						'description' => $product->description,
+						'id'          => $product->id,
+						'type'        => $product->type,
+					];
+					$productId = $product->id;
+					$this->updateOrCreateOption( 'start_after_product_id', $productId );
+					try {
+						$paypalObj->createProduct( $data );
+					}
+					catch (Exception $e )
+					{
+						error_log( print_r( $e->getMessage(), true ) );
+					}
+				}
+				$next = $products->has_more;
+				$startingAfter = $productId;
+
+			} while ( $next );
+			$this->updateOrCreateOption( 'start_after_product_id', $productId );
+
+		} catch ( Exception $e ) {
+			error_log( print_r( $e->getMessage(), true ) );
+			print_r( $e->getMessage() );
+		}
 //		die();
 //
 //		try {
@@ -193,7 +193,7 @@ class StripeToPaypalAPI {
 							'billing_cycles'      => $billingCycle,
 							'name'                => $plan->nickname ?? $plan->id,
 							'payment_preferences' => $paymentPref,
-							'product_id'          => 'prod_N2HA9wKNkAx5mp',
+							'product_id'          => $plan->product??'prod_N2HA9wKNkAx5mp',
 							'status'              => $plan->active ? 'ACTIVE' : 'INACTIVE',
 						];
 						$paypalPlan   = $paypalObj->createPlan( $planData );
